@@ -30,7 +30,7 @@
       if (currentUser) {
         const checkUserProfile = async () => {
           try {
-            const response = await fetch(`http://127.0.0.1:5000/api/check-profile`, {
+            const response = await fetch(`http://127.0.0.1:5000/api/check-profile-clients`, {
               method: 'POST',
               headers: {
                 'Content-type': 'application/json',
@@ -44,7 +44,7 @@
     
             const userData = await response.json();
             if (!userData.profileCompleted) {
-              navigate('/profile-setup');
+              navigate('/client-profile-setup');
             }
           } catch (error) {
             console.error('Error fetching user profile:', error);
@@ -74,9 +74,11 @@
           }
       }
     };
-    useEffect(()=>{
-      ProfileInfo();
-    });
+    useEffect(() => {
+      if (currentUser) {
+        ProfileInfo();
+      }
+    }, [currentUser]); 
 
     return (
       <div className="flex">

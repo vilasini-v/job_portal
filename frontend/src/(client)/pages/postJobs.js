@@ -6,11 +6,10 @@ import { getAuth } from "firebase/auth"; // Import Firebase Auth
 const ClientJobs = () => {
   const [jobs, setJobs] = useState([]); // State to store job postings
   const auth = getAuth();
-   // Firebase Auth
-
+  // Firebase Auth
   // Function to fetch jobs posted by the current user
   const fetchJobs = async () => {
-    const clientUsername = auth.currentUser ? auth.currentUser.uid : null;
+    const clientUsername = auth.currentUser ? auth.currentUser.email : null;
     if (clientUsername) {
         try {
             const response = await fetch(`http://127.0.0.1:5000/api/client-jobs/${clientUsername}`);
@@ -21,7 +20,6 @@ const ClientJobs = () => {
             }
             const data = await response.json();
             setJobs(data);
-            console.log(data); // Update the jobs state with the fetched data
         } catch (error) {
             console.error("Error fetching jobs:", error);
         }
@@ -48,6 +46,7 @@ const ClientJobs = () => {
     description: "",
     salary: "",
     location: "",
+    tags:"",
   });
 
   // Function to handle input changes
@@ -60,7 +59,7 @@ const ClientJobs = () => {
   const addJob = async (e) => {
     e.preventDefault();
     const currentUser = auth.currentUser; 
-    const clientUsername = currentUser.displayName || currentUser.email || currentUser.uid;  // Choose preferred field
+    const clientUsername = currentUser.email || currentUser.uid;  // Choose preferred field
     // Get the username from Firebase Auth
     const newJobWithClient = {
         ...newJob,
@@ -86,7 +85,7 @@ const ClientJobs = () => {
 
         // After adding a job, fetch all jobs again to ensure the list is up-to-date
         fetchJobs();
-        setNewJob({ title: "", description: "", salary: "", location: "" }); // Clear the form
+        setNewJob({ title: "", description: "", salary: "", location: "", tags:"" }); // Clear the form
         setShowModal(false); // Close the modal
     } catch (error) {
         console.error('Error submitting form:', error);
@@ -119,6 +118,7 @@ const ClientJobs = () => {
             <div className="mt-4">
                 <p className="text-sm text-gray-500">Salary: {job.salary}</p>
                 <p className="text-sm text-gray-500">Location: {job.location}</p>
+                <p className="text-sm text-gray-500">Tags: {job.tags}</p>
                 <button
                     className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
                     onClick={() => viewApplications(job._id)}
@@ -187,6 +187,17 @@ const ClientJobs = () => {
                     onChange={handleChange}
                     className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                     placeholder="Enter job location"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">Tags</label>
+                  <input
+                    type="text"
+                    name="tags"
+                    value={newJob.tags}
+                    onChange={handleChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                    placeholder="Enter tags"
                   />
                 </div>
 

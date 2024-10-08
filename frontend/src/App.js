@@ -8,50 +8,52 @@ import ProtectedRoute from './protectedRoute';
 import FreelancerProfile from './(freelancer)/pages/profile';
 import WelcomeScreen from './welcomescreen';
 import ClientJobs from './(client)/pages/postJobs';
-import ProfileSetup from './(client)/pages/profileSetup';
+import ProfileSetupClients from './(client)/pages/profileSetup';
+import FreelancerJobs from './(freelancer)/pages/freelancerJobs';
+import ProfileSetupFreelancers from './(freelancer)/pages/profileSetup';
 
 function App() {
-  const getProfileRoute = () => {
-    const userRole = localStorage.getItem('userRole'); // Get role from storage
-    if (userRole === 'client') return '/client-profile';
-    if (userRole === 'freelancer') return '/freelancer-profile';
-    return '/welcome'; // If role is not selected, go to the welcoming screen
-  };
-  const getJobsRoute=()=>{
-    const userRole = localStorage.getItem('userRole'); // Get role from storage
-    if (userRole === 'client') return '/client-jobs';
-    if (userRole === 'freelancer') return '/freelancer-jobs';
-    return '/welcome'; 
-  }
-  const { currentUser } = useAuth();
-  return (
-    <Router>
-      <Routes>
-        <Route
-          path="/"
-          element={currentUser ? <Navigate to="/profile" /> : <Navigate to="/signin" />}
-        />
+ const userRole = localStorage.getItem('userRole'); // Get role from storage once
 
-        <Route path="/signin" element={<SignIn />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/profile" element={<Navigate to={getProfileRoute()} />} />
-        <Route path="/client-profile" element={
-          <ProtectedRoute><ProfileClient /></ProtectedRoute>} />
-        <Route path="/freelancer-profile" element={<ProtectedRoute><FreelancerProfile /></ProtectedRoute>} />
-        <Route path="/jobs" element={<ProtectedRoute><Navigate to={getJobsRoute()}/></ProtectedRoute>}/>
-        <Route path='/client-jobs' element={
-          <ProtectedRoute><ClientJobs/></ProtectedRoute>}/>
-        <Route path='profile-setup' element={<ProtectedRoute>
-          <ProfileSetup/>
-        </ProtectedRoute>}/>
-        <Route path='/freelancer-jobs' element={
-          <ProtectedRoute><ClientJobs/></ProtectedRoute>}/>
+ const getProfileRoute = () => {
+  if (userRole === 'client') return '/client-profile';
+  if (userRole === 'freelancer') return '/freelancer-profile';
+  return '/welcome'; 
+ };
 
+ const getJobsRoute = () => {
+  if (userRole === 'client') return '/client-jobs';
+  if (userRole === 'freelancer') return '/freelancer-jobs';
+  return '/welcome'; 
+ };
 
-        <Route path="/welcome" element={<WelcomeScreen/>}/>
-      </Routes>
-    </Router>
-  );
+ const getProfileSetup = () => {
+  if (userRole === 'client') return '/client-profile-setup';
+  if (userRole === 'freelancer') return '/freelancer-profile-setup';
+  return '/welcome'; 
+ };
+
+ const { currentUser } = useAuth();
+
+ return (
+  <Router>
+   <Routes>
+    <Route path="/" element={<Navigate to={currentUser ? getProfileRoute() : '/signin'} />} />
+    <Route path="/signin" element={<SignIn />} />
+    <Route path="/signup" element={<SignUp />} />
+    <Route path="/profile" element={<Navigate to={getProfileRoute()} />} />
+    <Route path="/client-profile" element={<ProtectedRoute><ProfileClient /></ProtectedRoute>} />
+    <Route path="/freelancer-profile" element={<ProtectedRoute><FreelancerProfile /></ProtectedRoute>} />
+    <Route path="/jobs" element={<ProtectedRoute><Navigate to={getJobsRoute()} /></ProtectedRoute>} />
+    <Route path='/client-jobs' element={<ProtectedRoute><ClientJobs /></ProtectedRoute>} />
+    <Route path='/profile-setup' element={<Navigate to={getProfileSetup()} />} />
+    <Route path='/freelancer-jobs' element={<ProtectedRoute><FreelancerJobs /></ProtectedRoute>} />
+    <Route path='/freelancer-profile-setup' element={<ProtectedRoute><ProfileSetupFreelancers /></ProtectedRoute>} />
+    <Route path='/client-profile-setup' element={<ProtectedRoute><ProfileSetupClients /></ProtectedRoute>} />
+    <Route path="/welcome" element={<WelcomeScreen />} />
+   </Routes>
+  </Router>
+ );
 }
 
 export default App;
