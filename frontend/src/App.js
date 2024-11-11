@@ -11,6 +11,8 @@ import ClientJobs from './(client)/pages/postJobs';
 import ProfileSetupClients from './(client)/pages/profileSetup';
 import FreelancerJobs from './(freelancer)/pages/freelancerJobs';
 import ProfileSetupFreelancers from './(freelancer)/pages/profileSetup';
+import AppliedJobs from './(freelancer)/pages/appliedJobs';
+import ViewApplications from './(client)/pages/viewApplications';
 
 function App() {
  const userRole = localStorage.getItem('userRole'); // Get role from storage once
@@ -51,6 +53,8 @@ function App() {
     <Route path='/freelancer-profile-setup' element={<ProtectedRoute><ProfileSetupFreelancers /></ProtectedRoute>} />
     <Route path='/client-profile-setup' element={<ProtectedRoute><ProfileSetupClients /></ProtectedRoute>} />
     <Route path="/welcome" element={<WelcomeScreen />} />
+    <Route path="/applied-jobs" element={<ProtectedRoute><AppliedJobs/></ProtectedRoute>}/>
+    <Route path="client-jobs/:jobid" element={<ProtectedRoute><ViewApplications/></ProtectedRoute>}/>
    </Routes>
   </Router>
  );

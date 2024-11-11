@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "../../(components)/sidebar";
 import { sidebarlistclient } from "../../(components)/sidebarclient";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
+import { useNavigate } from "react-router-dom";
 
 const ClientJobs = () => {
   const [jobs, setJobs] = useState([]); // State to store job postings
   const auth = getAuth();
   // Firebase Auth
-  // Function to fetch jobs posted by the current user
   const fetchJobs = async () => {
     const clientUsername = auth.currentUser ? auth.currentUser.email : null;
     if (clientUsername) {
@@ -25,7 +25,7 @@ const ClientJobs = () => {
         }
     }
 };
-
+const navigate = useNavigate();
 
 
   // Fetch jobs when the component mounts
@@ -33,8 +33,9 @@ const ClientJobs = () => {
     fetchJobs();
   }, []);
 
-  const viewApplications = (jobId) => {
-    alert(`Viewing applications for job ID: ${jobId}`);
+  const viewApplications = (jobid) => {
+    console.log(jobid);
+    navigate(`${jobid}`)
   };
 
   // Modal visibility state
@@ -121,7 +122,7 @@ const ClientJobs = () => {
                 <p className="text-sm text-gray-500">Tags: {job.tags}</p>
                 <button
                     className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
-                    onClick={() => viewApplications(job._id)}
+                    onClick={() => viewApplications(job.Jobid)}
                 >
                     View Applications
                 </button>
