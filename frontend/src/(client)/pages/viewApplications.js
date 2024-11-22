@@ -25,6 +25,7 @@ const ViewApplications = () => {
           return;
         }
         const data = await response.json();
+        console.log(data)
         setApplications(data);
       } catch (error) {
         console.error("Error fetching applications:", error);
@@ -81,55 +82,28 @@ const ViewApplications = () => {
     } 
   
   }
-  const [compat, setCompat] = useState(null);
   const [matching, setMatching] = useState('');
   const [skillsModal, setSkillsModal] = useState(false);
-  const viewCompatibility = async (emailId, jobId, applicantionId) => {
-    console.log(emailId);
-    console.log(jobId);
-    if (emailId && jobId) {
-      try {
-        const response = await fetch(`http://127.0.0.1:5000/api/compatibility`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            applicant_email: emailId,
-            job_id: jobId,
-            application_id: applicantionId
-          })
-        });
-  
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error("Server error:", errorText);
-          return;
-        }
-  
-        const data = await response.json();
-        console.log(data.compatibility_percentage);
-        setCompat(data.compatibility_percentage);
-        console.log(typeof(data.matching_skills))
-        let result="";
-        var arr=data.matching_skills
-        for(let i=0; i<arr.length; i++){
-          result += arr[i];
-
-          // Add a comma after each element except for the last one
-          if (i < arr.length - 1) {
-            result += ", ";
-          }                                   
-        }
-        setMatching(result)
+  const viewCompatibility = (matching_skills) => {
+    console.log("Before viewCompatibility:", matching_skills);
+    console.log("Is Array?", Array.isArray(matching_skills));
+  console.log("Length:", matching_skills?.length);
+    // Add error handling for undefined or null matching_skills
+    if (!matching_skills) {
+        console.error("matching_skills is undefined or null");
+        setMatching("No matching skills available");
         setSkillsModal(true);
-        console.log(matching)
-        
-      } catch (error) {
-        console.error("Error fetching compatibility data:", error);
-      }
+        return;
     }
-  };
+
+    // Simpler way to join array elements with commas
+    const result = matching_skills.join(", ");
+    
+    setMatching(result);
+    setSkillsModal(true);
+    console.log(matching); // Note: This will show the previous state due to setState being async
+};
+  
 
   return (
     <>
@@ -162,11 +136,9 @@ const ViewApplications = () => {
                     <td className="p-2 text-center">{ap.emailid}</td>
                     <td className="p-2 text-center">{ap.quote}</td>
                     <td className="p-2 text-center"><button className="bg-slate-50 p-1 rounded-md shadow-sm hover:bg-blue-200" onClick={()=>viewProfileApplicant(ap.emailid)}>View Profile</button></td>
-                    <td className="p-2 text-center"><button className="bg-slate-50 p-1 rounded-md shadow-sm hover:bg-blue-300" onClick={()=>viewCompatibility(ap.emailid, ap.Jobid, ap.applicationID)}>
-                    {
-                    compat
-                      ? `${compat.toFixed(1)}%`
-                      : 'Click me'
+                    <td className="p-2 text-center"><button className="bg-slate-50 p-1 rounded-md shadow-sm hover:bg-blue-300" onClick={()=>viewCompatibility(ap.matchingSkills)}>
+                    {                  
+                    `${ap.compatibilityPercentage}`
                     }
                       </button></td>
                     <td className="p-2 text-center">

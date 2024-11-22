@@ -55,6 +55,21 @@ def apply_job():
     job_data = request.json
     jobid = job_data.get('jobid')
     job=jobs_collection.find_one({'Jobid':jobid},{'title': 1, 'description': 1, '_id': 0})
+    job_skills = list(jobs_collection.find({"Jobid": jobid}, {"_id": 0, "tags": 1}))
+    if not job_skills:
+        return jsonify({'error': 'Job not found'}), 404
+    job_skills = job_skills[0].get('tags', [])
+    
+    # Fetch user skills
+    user_skills = list(profiles_freelancers.find({"email": job_data.get("applicantEmail")}, {"_id": 0, "skills": 1}))
+    if not user_skills:
+        return jsonify({'error': 'User not found'}), 404
+    user_skills = user_skills[0].get('skills', [])
+    
+    user_skills = list(user_skills.split(','))
+    job_skills = list(job_skills.split(','))
+        
+    compatibility_percentage, matching_skills = calculate_compatibility(job_skills, user_skills)
     apply_job={
         "applicationID": str(uuid.uuid4()),
         'title':job.get("title"),
@@ -64,10 +79,12 @@ def apply_job():
         "Jobid":job_data.get('jobid'),
         "resume": job_data.get('resume'),
         "quote": job_data.get("quote"),
-        "status": "No Result"
+        "status": "No Result",
+        'compatibilityPercentage': compatibility_percentage,
+        "matchingSkills" : list(matching_skills)
     }
-
     applications_collection.insert_one(apply_job)  # Insert job data into MongoDB
+    
     return jsonify({"message": "application added successfully!"}), 201
 
 @app.route('/api/applications/<applicationID>', methods=['PUT'])
